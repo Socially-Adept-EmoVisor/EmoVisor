@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
 
     environment:
-      redis_url: "redis://5EBANw2m@redis:6379/0"
+      redis_url: "redis://:5EBANw2m@redis:6379/0"
       minio_endpoint: "http://s3:9000"
 
     ports:
@@ -18,7 +18,7 @@ services:
 
   redis:
     image: redis:6.2.6
-    command: redis-server --requirepass duEA45Tt
+    command: redis-server --requirepass 5EBANw2m
     ports:
       - 6379:6379
 

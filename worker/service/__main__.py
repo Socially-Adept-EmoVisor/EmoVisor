@@ -1,7 +1,7 @@
 import click
 import boto3
+import redis
 
-from redis import Redis
 from typing import Optional
 from dataclass_factory import Factory
 from loguru import logger
@@ -18,14 +18,14 @@ def cli():
 
 
 @cli.command()
-@click.option("--redis-host", default="redis")
+@click.option("--redis-url", default="redis://redis:6379/0")
 @click.option("--job-queue", default="job-queue")
 @click.option("--minio-access-key")
 @click.option("--minio-secret-key")
 @click.option("--minio-endpoint", default="http://localhost:9000")
 @click.option()
-def run(redis_host: str, job_queue: str, minio_access_key: str, minio_secret_key: str, minio_endpoint: str):
-    redis = Redis(host=redis_host, port=6379, db=0)
+def run(redis_url: str, job_queue: str, minio_access_key: str, minio_secret_key: str, minio_endpoint: str):
+    r = redis.from_url(redis_url)
     s3client = boto3.client(
         service_name='s3',
         aws_access_key_id=minio_access_key,
@@ -36,13 +36,13 @@ def run(redis_host: str, job_queue: str, minio_access_key: str, minio_secret_key
 
     factory = Factory()
     while True:
-        pending = redis.blpop(job_queue)
+        pending = r.blpop(job_queue)
         task = factory.load(pending, TaskInfo)
         try:
             file_path = download(task.video_url, f"{task.id}.mp4")
             result_path = process_video(file_path)
             s3client.upload_file(result_path, "processed-videos", f"{task.id}.mp4")
-            redis.set(f"task:{task.id}", 1)
+            r.set(f"task:{task.id}", 1)
         except:  # noqa
             logger.exception(f"Error during processing task {task.id}!")
 
