@@ -11,7 +11,7 @@ def detect_faces(image) -> list[tuple[int]]:
     return [(0, 0, 20, 20), (15, 40, 60, 60)]
 
 
-def assess_face(face: tuple[int]) -> VideoEmotions:
+def assess_face(face) -> VideoEmotions:
     return VideoEmotions("happy")
 
 
@@ -32,11 +32,12 @@ def assess_emotions(video_path: str, skipfames: int) -> VideoResult:
             cur += 1
 
             rois = detect_faces(frame)
-            for roi in rois:
-                emotion = assess_face(roi)
+            for (x0, y0, x1, y1) in rois:
+                face = frame[y0: y1, x0:x1]
+                emotion = assess_face(face)
                 if emotion is None:
                     continue
                 res.result.append(VideoDetection(
-                    time_start=min(0, (cur-skipfames) / fps), time_end=cur / fps, roi=roi, emotion=emotion))
+                    time_start=min(0, (cur-skipfames) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
     finally:
         cap.release()
