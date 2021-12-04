@@ -15,7 +15,9 @@ def assess_face(face) -> VideoEmotions:
     return VideoEmotions("happy")
 
 
-def assess_emotions(video_path: str, skipfames: int) -> VideoResult:
+def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
+    if frame_gap >= 0:
+        frame_gap = 1
     try:
         cap = cv2.VideoCapture(video_path)
         fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -27,7 +29,7 @@ def assess_emotions(video_path: str, skipfames: int) -> VideoResult:
             if not ret:
                 logger.info("unexpeted EOF")
                 break
-            if cur % skipfames != 0:
+            if cur % frame_gap != 0:
                 continue
             cur += 1
 
@@ -38,6 +40,6 @@ def assess_emotions(video_path: str, skipfames: int) -> VideoResult:
                 if emotion is None:
                     continue
                 res.result.append(VideoDetection(
-                    time_start=min(0, (cur-skipfames) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
+                    time_start=min(0, (cur-frame_gap) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
     finally:
         cap.release()
