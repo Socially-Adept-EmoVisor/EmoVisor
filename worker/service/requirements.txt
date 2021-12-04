@@ -1,0 +1,9 @@
+opencv-python
+facenet_pytorch
+torch
+torchvision
+Pillow
+pathlib
+argparse
+numpy
+loguru

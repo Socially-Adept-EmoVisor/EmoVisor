@@ -1,10 +1,8 @@
-from worker.service.models import AudioResult
-
-
+from typing import Tuple
 from ..models import VideoResult, AudioResult
-import video.assess
-import audio.assess
+from .video.assess import assess_emotions as video_assess
+from .audio.assess import assess_emotions as audio_assess
 
 
-def assess_emotions(video_path: str) -> tuple[VideoResult, AudioResult]:
-    return (video.assess.assess_emotions(video_path, 1), audio.assess.assess_emotions(video_path))
+def assess_emotions(video_path: str) ->Tuple[VideoResult, AudioResult]:
+    return (video_assess(video_path, 1), audio_assess(video_path))

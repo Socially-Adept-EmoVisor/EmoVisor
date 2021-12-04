@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional,List,Tuple
 
 
 @dataclass
@@ -10,10 +10,9 @@ class TaskInfo:
 
 @dataclass
 class VideoEmotion:
-    '''
-    изменится в зависимости от модели оценивающий звук
-    '''
-    emotion: str
+    arrousal:float
+    valence:float
+    expression:str
 
 
 @dataclass
@@ -33,24 +32,24 @@ class AudioDetection:
 
 @dataclass
 class AudioResult:
-    result: list[AudioDetection]
+    result: List[AudioDetection]
 
 
 @dataclass
 class VideoDetection:
     time_start: float
     time_end: float
-    roi: tuple[int]
+    roi: Tuple[int]
     emotion: VideoEmotion
 
 
 @dataclass
 class VideoResult:
-    result: list[VideoDetection]
+    result: List[VideoDetection]
 
 
 @dataclass
 class Highlight:
     time_start: float
     time_end: float
-    roi: Optional[tuple[int]]
+    roi: Optional[Tuple[int]]
