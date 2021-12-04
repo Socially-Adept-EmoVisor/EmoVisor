@@ -13,7 +13,7 @@ from .emonet.data_augmentation import DataAugmentor
 
 device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
 out_expression = {0: 'neutral', 1: 'happy', 2: 'sad', 3: 'surprise',
-                 4: 'fear', 5: 'disgust', 6: 'anger', 7: 'contempt', 8: 'none'}
+                  4: 'fear', 5: 'disgust', 6: 'anger', 7: 'contempt', 8: 'none'}
 
 image_size = 256
 
@@ -32,7 +32,8 @@ net = EmoNet(n_expression=8).to(device)
 net.load_state_dict(state_dict, strict=False)
 net.eval()
 
-def get_emotion(image, model)->VideoEmotion:
+
+def get_emotion(image, model) -> VideoEmotion:
     # Do inference
     with torch.no_grad():
         out = model(image)
@@ -43,7 +44,8 @@ def get_emotion(image, model)->VideoEmotion:
     val = out['valence']
     ar = out['arousal']
     landmarks = out['heatmap']
-    return VideoEmotion(arrousal=ar.data[0],valence=val.data[0],expression=out_expression)
+    return VideoEmotion(arrousal=ar.data[0], valence=val.data[0], expression=out_expression)
+
 
 def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
     if frame_gap >= 0:
@@ -71,7 +73,7 @@ def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
             print(boxes)
             for (x0, y0, x1, y1) in boxes:
                 cv2.rectangle(frame, (int(x0), int(y0)),
-                            (int(x1), int(y1)), (255, 0, 0), 2)
+                              (int(x1), int(y1)), (255, 0, 0), 2)
                 image = rgb_frame[int(y0): int(y1), int(x0): int(x1)]
                 # Apply transforms
                 if transform_image_shape_no_flip is not None:
@@ -85,8 +87,8 @@ def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
 
                 # Predict probabilities
                 emotion = get_emotion(input, net)
-                # print(emotion)
-                # res.result.append(VideoDetection(
-                #     time_start=min(0, (cur-frame_gap) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
+                print(emotion)
+                res.result.append(VideoDetection(
+                    time_start=min(0, (cur-frame_gap) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
     finally:
         cap.release()
