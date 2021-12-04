@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: api/
+      dockerfile: Dockerfile
+
+    environment:
+      redis_url: "redis://redis:6379/0"
+      minio_endpoint: "http://s3:9000"
+
+    ports:
+      - 80:80
+
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - 6379:6379
+
+  s3:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./storage/minio:/data
+    environment:
+      MINIO_ROOT_USER: AMOGUS
+      MINIO_ROOT_PASSWORD: SUSSYIMP0STER
+    command: server /data --console-address ":9001"
