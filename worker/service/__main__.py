@@ -42,6 +42,7 @@ def run(redis_host: str, job_queue: str, minio_access_key: str, minio_secret_key
             file_path = download(task.video_url, f"{task.id}.mp4")
             result_path = process_video(file_path)
             s3client.upload_file(result_path, "processed-videos", f"{task.id}.mp4")
+            redis.set(f"task:{task.id}", 1)
         except:  # noqa
             logger.exception(f"Error during processing task {task.id}!")
 
