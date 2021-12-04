@@ -11,6 +11,6 @@ def process_video(full_video_path: str) -> str:
     return res_video_path
 
 if __name__=="__main__":
-    path = 'D:\Papka\work\emovisor\Boomers_Get_Mad_At_Tyler1.mp4'
+    path = 'D:\Papka\work\EmoVisor\Boomers_Get_Mad_At_Tyler1.mp4'
     res = process_video(path)
     print(res)

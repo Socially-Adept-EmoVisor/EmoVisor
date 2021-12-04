@@ -33,7 +33,7 @@ net.load_state_dict(state_dict, strict=False)
 net.eval()
 
 
-def get_emotion(image, model) -> VideoEmotion:
+def get_emotion(image, model):
     # Do inference
     with torch.no_grad():
         out = model(image)
@@ -44,7 +44,7 @@ def get_emotion(image, model) -> VideoEmotion:
     val = out['valence']
     ar = out['arousal']
     landmarks = out['heatmap']
-    return VideoEmotion(arrousal=ar.data[0], valence=val.data[0], expression=out_expression)
+    return val, ar, out_expression[expr], landmarks
 
 
 def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
@@ -86,9 +86,21 @@ def assess_emotions(video_path: str, frame_gap: int) -> VideoResult:
                 input = image_tensor.to(device)
 
                 # Predict probabilities
-                emotion = get_emotion(input, net)
+                valence, arousal, emotion_name, _ = get_emotion(input, net)
+                emotion = VideoEmotion(
+                    arrousal=arousal.data[0], valence=valence.data[0], expression=emotion_name)
                 print(emotion)
                 res.result.append(VideoDetection(
                     time_start=min(0, (cur-frame_gap) / fps), time_end=cur / fps, roi=(x0, y0, x1, y1), emotion=emotion))
+                cv2.putText(frame, emotion_name, (int(x0), int(y0)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 1)
+                cv2.putText(frame, f"Valence: {valence.item()}", (int(x0), int(
+                    y0-30)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 1)
+                cv2.putText(frame, f"Arousal: {arousal.item()}", (int(x0), int(
+                    y0-60)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 1)
+
+                cv2.imshow("frame", frame)
+                cv2.waitKey(40)
+                break
     finally:
         cap.release()
