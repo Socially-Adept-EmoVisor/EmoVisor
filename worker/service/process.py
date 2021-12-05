@@ -10,7 +10,17 @@ def process_video(full_video_path: str) -> str:
     res_video_path = cut_video(full_video_path, highlights)
     return res_video_path
 
-if __name__=="__main__":
-    path = 'D:\Papka\work\EmoVisor\Boomers_Get_Mad_At_Tyler1.mp4'
+
+if __name__ == "__main__":
+    path = r'C:\Users\hexpisos\Downloads\cut_xqc.mp4'
+    filenames = [f'{i}.png' for i in range(832)]
+    with imageio.get_writer('valence+arousal.gif', mode='I') as writer:
+        for filename in filenames:
+            image = imageio.imread(filename)
+            writer.append_data(image)
+    with imageio.get_writer('polar.gif', mode='I') as writer:
+        for filename in filenames:
+            image = imageio.imread('p' + filename)
+            writer.append_data(image)
+
     res = process_video(path)
-    print(res)
